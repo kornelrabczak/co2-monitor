@@ -1,6 +1,9 @@
 package com.thecookiezen.co2.domain
 
+import java.time.ZoneOffset
+
 import com.thecookiezen.co2.domain.Co2Sample.Measurement
+import com.thecookiezen.co2.domain.Co2Sensor.Co2SampleReading
 
 case class Co2Sample(utcTimestamp: Long, sample: Measurement)
 
@@ -20,4 +23,6 @@ object Co2Sample {
   }
 
   val max: List[Co2Sample] => Option[Co2Sample] = _.maxByOption(_.sample)
+
+  def fromReading(reading: Co2SampleReading): Co2Sample = Co2Sample(reading.time.toEpochSecond(ZoneOffset.UTC), reading.measurement)
 }
