@@ -1,5 +1,12 @@
 package com.thecookiezen.co2
 
+import com.typesafe.config.ConfigFactory
+
 object Co2App extends App {
-  println("hello co2!")
+
+  val config = ConfigFactory.load("sensor.conf");
+
+  val thresholdLevel = config.getInt("sensor.co2_threshold_level")
+
+  println(s"hello co2!, threshold level = $thresholdLevel")
 }
