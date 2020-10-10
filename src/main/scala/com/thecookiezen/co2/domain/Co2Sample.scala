@@ -6,4 +6,18 @@ case class Co2Sample(utcTimestamp: Long, sample: Measurement)
 
 object Co2Sample {
   type Measurement = Int
+
+  val average: List[Co2Sample] => Option[Double] = { samples =>
+    if (samples.isEmpty) {
+      None
+    } else {
+      val (sum, events) = samples.foldLeft((0, 0)) {
+        case ((sum, number), sample) => (sum + sample.sample, number + 1)
+      }
+
+      Some(sum.toDouble / events)
+    }
+  }
+
+  val max: List[Co2Sample] => Option[Co2Sample] = _.maxByOption(_.sample)
 }
