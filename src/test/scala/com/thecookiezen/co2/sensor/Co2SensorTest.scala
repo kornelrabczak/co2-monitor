@@ -1,11 +1,12 @@
-package com.thecookiezen.co2.domain
+package com.thecookiezen.co2.sensor
 
 import java.time.{LocalDateTime, ZoneOffset}
 import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
-import com.thecookiezen.co2.domain.Co2Sensor._
+import com.thecookiezen.co2.domain.{AlertLog, Statistics}
+import com.thecookiezen.co2.sensor.Co2Sensor._
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike
 import org.scalatest.matchers.should.Matchers

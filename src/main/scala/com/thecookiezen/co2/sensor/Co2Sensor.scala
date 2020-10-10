@@ -1,11 +1,12 @@
-package com.thecookiezen.co2.domain
+package com.thecookiezen.co2.sensor
 
 import java.time._
 import java.util.UUID
 
 import akka.actor.{Actor, ActorLogging, Props}
 import com.thecookiezen.co2.domain.Co2Sample.Measurement
-import com.thecookiezen.co2.domain.Co2Sensor._
+import com.thecookiezen.co2.domain.{AlertLog, Co2Sample, Statistics}
+import com.thecookiezen.co2.sensor.Co2Sensor._
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration
@@ -96,13 +97,6 @@ object Co2Sensor {
 
   def props(id: UUID, alertThreshold: Measurement): Props = Props(new Co2Sensor(id, alertThreshold))
 
-  def isDateFromLast30Days(time: LocalDateTime): Boolean = {
-    val thirtyDaysAgo = LocalDate.now(DefaulZoneId).minusDays(31)
-    time.atZone(DefaulZoneId).toLocalDate.isAfter(thirtyDaysAgo)
-  }
-
-  case class Co2SampleReading(time: LocalDateTime, measurement: Measurement)
-
   case class CleanOldSamples(duration: Duration)
 
   sealed trait SensorState
@@ -110,8 +104,10 @@ object Co2Sensor {
   case object WARN extends SensorState
   case object ALERT extends SensorState
 
-  case object GetStatus
-  case object GetAlertList
-  case object GetStatistics
+  sealed trait Command
+  case class Co2SampleReading(time: LocalDateTime, measurement: Measurement) extends Command
+  case object GetStatus extends Command
+  case object GetAlertList extends Command
+  case object GetStatistics extends Command
 
 }
