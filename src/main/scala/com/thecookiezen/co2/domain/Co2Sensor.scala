@@ -3,7 +3,7 @@ package com.thecookiezen.co2.domain
 import java.time.LocalDate
 import java.util.UUID
 
-import com.thecookiezen.co2.domain.Co2Sensor.{Alert, SensorState}
+import com.thecookiezen.co2.domain.Co2Sensor.{AlertLog, SensorState}
 import com.thecookiezen.co2.domain.Co2Sample.Measurement
 
 case class Co2Sensor(id: UUID,
@@ -11,11 +11,11 @@ case class Co2Sensor(id: UUID,
                      alertThreshold: Int,
                      measurements: List[Co2Sample],
                      currentState: SensorState,
-                     logs: List[Alert])
+                     logs: List[AlertLog])
 
 object Co2Sensor {
 
-  case class Alert(startTime: Long,
+  case class AlertLog(startTime: Long,
                    endTime: Long,
                    measurement1: Measurement,
                    measurement2: Measurement,
