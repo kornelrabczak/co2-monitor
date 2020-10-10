@@ -8,6 +8,7 @@ import com.thecookiezen.co2.domain.Co2Sample.Measurement
 
 case class Co2Sensor(id: UUID,
                      lastMeasurementTimestamp: LocalDate,
+                     alertThreshold: Int,
                      measurements: List[Co2Sample],
                      currentState: SensorState,
                      logs: List[Alert])
