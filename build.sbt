@@ -47,5 +47,15 @@ lazy val root = (project in file("."))
     name := "co2-monitor",
     libraryDependencies += scalaTest % Test,
     libraryDependencies += logback % Compile,
-    libraryDependencies ++= akka
+    libraryDependencies ++= tapir,
+    libraryDependencies ++= akka,
+    libraryDependencies ++= slf4j
   )
+
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", "maven", "org.webjars", "swagger-ui", "pom.properties") =>
+    MergeStrategy.singleOrError
+  case x =>
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(x)
+}
