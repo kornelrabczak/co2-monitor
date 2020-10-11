@@ -19,18 +19,25 @@ class SensorCoordinator(alertThreshold: Measurement) extends Actor with ActorLog
   }
 
   override def receive: Receive = {
+    case SensorRequest(id: UUID, command: Co2SampleReading) =>
+      if (isDateFromLast30Days(command.time))
+        forwardMessage(id, command)
     case SensorRequest(id: UUID, command: Command) =>
-      context.child(id.toString) match {
-        case Some(child) =>
-          log.info("SensorCoordinator forwards message {} to {}", command, id)
-          child.tell(command, sender())
-        case None =>
-          log.info("SensorCoordinator creates new actor and forwards message {} to {}", command, id)
-          val child = context.actorOf(Co2Sensor.props(id, alertThreshold), id.toString)
-          child.tell(command, sender())
-      }
+      forwardMessage(id, command)
     case CleanOldSamples => context.children.foreach { child =>
       child ! CleanOldSamples
+    }
+  }
+
+  private def forwardMessage(id: UUID, command: Command): Unit = {
+    context.child(id.toString) match {
+      case Some(child) =>
+        log.info("SensorCoordinator forwards message {} to {}", command, id)
+        child.tell(command, sender())
+      case None =>
+        log.info("SensorCoordinator creates new actor and forwards message {} to {}", command, id)
+        val child = context.actorOf(Co2Sensor.props(id, alertThreshold), id.toString)
+        child.tell(command, sender())
     }
   }
 }
