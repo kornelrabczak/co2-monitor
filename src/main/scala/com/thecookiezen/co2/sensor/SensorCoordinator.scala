@@ -3,9 +3,13 @@ package com.thecookiezen.co2.sensor
 import java.time.{LocalDate, ZoneId, ZonedDateTime}
 import java.util.UUID
 
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.pattern.ask
+import akka.util.Timeout
+import com.thecookiezen.co2.domain.{AlertLog, Statistics}
 import com.thecookiezen.co2.domain.Co2Sample.Measurement
-import com.thecookiezen.co2.sensor.Co2Sensor.{CleanOldSamples, Co2SampleReading, Command}
+import com.thecookiezen.co2.domain.Sensor._
+import com.thecookiezen.co2.sensor.Co2Sensor.CleanOldSamples
 import com.thecookiezen.co2.sensor.SensorCoordinator.{SensorRequest, isDateFromLast30Days}
 
 import scala.concurrent.duration.{Duration, DurationInt}
@@ -43,6 +47,8 @@ class SensorCoordinator(alertThreshold: Measurement) extends Actor with ActorLog
 }
 
 object SensorCoordinator {
+  implicit val timeout = Timeout(1.seconds)
+
   private val DefaultZoneId: ZoneId = ZoneId.of("UTC")
 
   def props(alertThreshold: Measurement): Props = Props(new SensorCoordinator(alertThreshold))
@@ -53,4 +59,20 @@ object SensorCoordinator {
   }
 
   case class SensorRequest(id: UUID, command: Command)
+
+  val storeMeasurement: ActorRef => StoreMeasurement = coordinator => {
+    case (uuid, sample) => coordinator ! SensorRequest(uuid, sample)
+  }
+
+  val getStatus: ActorRef => GetStatus = coordinator => uuid => {
+    coordinator ? SensorRequest(uuid, GetStatus)
+  }.mapTo[SensorState]
+
+  val getStatistics: ActorRef => GetStatistics = coordinator => uuid => {
+    coordinator ? SensorRequest(uuid, GetStatistics)
+  }.mapTo[Statistics]
+
+  val getAlerts: ActorRef => GetAlertLogs = coordinator => uuid => {
+    coordinator ? SensorRequest(uuid, GetAlertList)
+  }.mapTo[List[AlertLog]]
 }

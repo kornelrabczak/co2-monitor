@@ -5,8 +5,8 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
+import com.thecookiezen.co2.domain.Sensor.{Co2SampleReading, GetStatistics}
 import com.thecookiezen.co2.domain.Statistics
-import com.thecookiezen.co2.sensor.Co2Sensor.{Co2SampleReading, GetStatistics}
 import com.thecookiezen.co2.sensor.SensorCoordinator.SensorRequest
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpecLike

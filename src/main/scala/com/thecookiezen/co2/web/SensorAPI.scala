@@ -5,20 +5,18 @@ import java.util.UUID
 
 import akka.http.scaladsl.server.Directives.concat
 import akka.http.scaladsl.server.Route
-import com.thecookiezen.co2.Co2App.{GetAlertLogs, GetStatistics, GetStatus, StoreMeasurement}
 import com.thecookiezen.co2.domain.Co2Sample.Measurement
-import com.thecookiezen.co2.sensor.Co2Sensor.SensorState
+import com.thecookiezen.co2.domain.Sensor._
 import com.thecookiezen.co2.web.SensorAPI._
 import io.circe.Codec
-import io.circe.generic.extras.auto._
 import io.circe.generic.extras.Configuration
+import io.circe.generic.extras.auto._
 import io.circe.generic.extras.semiauto.{deriveConfiguredCodec, deriveEnumerationCodec}
 import sttp.tapir._
-import sttp.tapir.json.circe._
-import sttp.tapir.server.akkahttp._
-
 import sttp.tapir.docs.openapi._
+import sttp.tapir.json.circe._
 import sttp.tapir.openapi.circe.yaml._
+import sttp.tapir.server.akkahttp._
 import sttp.tapir.swagger.akkahttp.SwaggerAkka
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -66,7 +64,7 @@ class SensorAPI(storeMeasurement: StoreMeasurement,
   )
 
   private def handleStoreMeasurement(storeMeasurement: StoreMeasurement)(uuid: UUID, json: SampleJson): Future[Either[Unit, Unit]] = {
-    storeMeasurement(uuid, json)
+    storeMeasurement(uuid, Co2SampleReading(json.time, json.co2))
     Future.successful(Right(()))
   }
 
@@ -79,15 +77,17 @@ class SensorAPI(storeMeasurement: StoreMeasurement,
   }
 
   private def handleGetAlerts(getAlerts: GetAlertLogs)(uuid: UUID): Future[Either[Unit, List[AlertLogJson]]] = {
-    getAlerts(uuid).map { _.map { alert =>
-      AlertLogJson(
-        startTime = utcTimestamp2DateTime(alert.startTime),
-        endTime = alert.endTime.map(utcTimestamp2DateTime),
-        measurement1 = alert.measurements.headOption.getOrElse(0),
-        measurement2 = alert.measurements.lift(1).getOrElse(0),
-        measurement3 = alert.measurements.lift(2).getOrElse(0)
-      )
-    }}.map(Right(_))
+    getAlerts(uuid).map {
+      _.map { alert =>
+        AlertLogJson(
+          startTime = utcTimestamp2DateTime(alert.startTime),
+          endTime = alert.endTime.map(utcTimestamp2DateTime),
+          measurement1 = alert.measurements.headOption.getOrElse(0),
+          measurement2 = alert.measurements.lift(1).getOrElse(0),
+          measurement3 = alert.measurements.lift(2).getOrElse(0)
+        )
+      }
+    }.map(Right(_))
   }
 }
 
@@ -107,11 +107,15 @@ object SensorAPI {
   implicit val statusJsonCodec: Codec[StatusJson] = deriveConfiguredCodec[StatusJson]
 
   case class SampleJson(co2: Measurement, time: ZonedDateTime)
+
   case class StatusJson(status: SensorState)
+
   case class StatisticsJson(maxLast30Days: Int, avgLast30Days: Int)
+
   case class AlertLogJson(startTime: ZonedDateTime,
                           endTime: Option[ZonedDateTime],
                           measurement1: Measurement,
                           measurement2: Measurement,
                           measurement3: Measurement)
+
 }

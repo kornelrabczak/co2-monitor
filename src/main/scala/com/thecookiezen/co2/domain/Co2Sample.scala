@@ -1,7 +1,7 @@
 package com.thecookiezen.co2.domain
 
 import com.thecookiezen.co2.domain.Co2Sample.Measurement
-import com.thecookiezen.co2.sensor.Co2Sensor.Co2SampleReading
+import com.thecookiezen.co2.domain.Sensor.Co2SampleReading
 
 case class Co2Sample(utcTimestamp: Long, sample: Measurement)
 

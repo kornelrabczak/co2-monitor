@@ -5,6 +5,7 @@ import java.util.UUID
 
 import akka.actor.ActorSystem
 import akka.testkit.TestKit
+import com.thecookiezen.co2.domain.Sensor._
 import com.thecookiezen.co2.domain.{AlertLog, Statistics}
 import com.thecookiezen.co2.sensor.Co2Sensor._
 import org.scalatest.BeforeAndAfterAll

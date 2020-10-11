@@ -2,8 +2,8 @@ package com.thecookiezen.co2.web
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, StatusCodes}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
+import com.thecookiezen.co2.domain.Sensor.OK
 import com.thecookiezen.co2.domain.{AlertLog, Statistics}
-import com.thecookiezen.co2.sensor.Co2Sensor.OK
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

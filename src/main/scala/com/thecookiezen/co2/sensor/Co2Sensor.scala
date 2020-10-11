@@ -5,6 +5,7 @@ import java.util.UUID
 
 import akka.actor.{Actor, ActorLogging, Props}
 import com.thecookiezen.co2.domain.Co2Sample.Measurement
+import com.thecookiezen.co2.domain.Sensor._
 import com.thecookiezen.co2.domain.{AlertLog, Co2Sample, Statistics}
 import com.thecookiezen.co2.sensor.Co2Sensor._
 
@@ -98,16 +99,4 @@ object Co2Sensor {
   def props(id: UUID, alertThreshold: Measurement): Props = Props(new Co2Sensor(id, alertThreshold))
 
   case class CleanOldSamples(duration: Duration)
-
-  sealed trait SensorState
-  case object OK extends SensorState
-  case object WARN extends SensorState
-  case object ALERT extends SensorState
-
-  sealed trait Command
-  case class Co2SampleReading(time: ZonedDateTime, measurement: Measurement) extends Command
-  case object GetStatus extends Command
-  case object GetAlertList extends Command
-  case object GetStatistics extends Command
-
 }
