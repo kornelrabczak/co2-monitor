@@ -3,8 +3,8 @@
 Application for CO2 level measurement gathering from sensors.
 
 - Gather measurements from multiple sensors
-– Average CO2 level for the last 30 days 
-– Maximum CO2 Level in the last 30 days
+- Average CO2 level for the last 30 days 
+- Maximum CO2 Level in the last 30 days
 - Create alert when CO2 level exceeds
 
 ## Technical details
