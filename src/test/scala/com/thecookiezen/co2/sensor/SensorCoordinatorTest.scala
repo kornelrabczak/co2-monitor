@@ -1,6 +1,6 @@
 package com.thecookiezen.co2.sensor
 
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.UUID
 
 import akka.actor.ActorSystem
@@ -30,9 +30,9 @@ class SensorCoordinatorTest extends TestKit(ActorSystem())
     val sensor2 = UUID.randomUUID()
     val sensor3 = UUID.randomUUID()
 
-    coordinator ! SensorRequest(sensor1, Co2SampleReading(LocalDateTime.now(), 10))
-    coordinator ! SensorRequest(sensor1, Co2SampleReading(LocalDateTime.now(), 20))
-    coordinator ! SensorRequest(sensor3, Co2SampleReading(LocalDateTime.now(), 30))
+    coordinator ! SensorRequest(sensor1, Co2SampleReading(ZonedDateTime.now(), 10))
+    coordinator ! SensorRequest(sensor1, Co2SampleReading(ZonedDateTime.now(), 20))
+    coordinator ! SensorRequest(sensor3, Co2SampleReading(ZonedDateTime.now(), 30))
 
     coordinator ! SensorRequest(sensor1, GetStatistics)
     expectMsg[Statistics](Statistics(15.0, 20))

@@ -81,8 +81,8 @@ class Co2Sensor(id: UUID, alertThreshold: Measurement) extends Actor with ActorL
     case CleanOldSamples(duration) =>
       val keepDays = duration.toDays
       measurements = measurements.filter { sample =>
-        val fromDate = LocalDate.now(DefaulZoneId).minusDays(keepDays + 1)
-        val sampleDate = LocalDate.ofInstant(Instant.ofEpochSecond(sample.utcTimestamp), DefaulZoneId)
+        val fromDate = ZonedDateTime.now(DefaultZoneId).minusDays(keepDays + 1)
+        val sampleDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(sample.utcTimestamp), DefaultZoneId)
         sampleDate.isAfter(fromDate)
       }
   }
@@ -93,7 +93,7 @@ class Co2Sensor(id: UUID, alertThreshold: Measurement) extends Actor with ActorL
 }
 
 object Co2Sensor {
-  private val DefaulZoneId: ZoneId = ZoneId.of("UTC");
+  private val DefaultZoneId: ZoneId = ZoneId.of("UTC");
 
   def props(id: UUID, alertThreshold: Measurement): Props = Props(new Co2Sensor(id, alertThreshold))
 
@@ -105,7 +105,7 @@ object Co2Sensor {
   case object ALERT extends SensorState
 
   sealed trait Command
-  case class Co2SampleReading(time: LocalDateTime, measurement: Measurement) extends Command
+  case class Co2SampleReading(time: ZonedDateTime, measurement: Measurement) extends Command
   case object GetStatus extends Command
   case object GetAlertList extends Command
   case object GetStatistics extends Command

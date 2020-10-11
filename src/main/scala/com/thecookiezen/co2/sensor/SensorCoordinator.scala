@@ -1,12 +1,12 @@
 package com.thecookiezen.co2.sensor
 
-import java.time.{LocalDate, LocalDateTime, ZoneId}
+import java.time.{LocalDate, ZoneId, ZonedDateTime}
 import java.util.UUID
 
 import akka.actor.{Actor, ActorLogging, Props}
 import com.thecookiezen.co2.domain.Co2Sample.Measurement
-import com.thecookiezen.co2.sensor.Co2Sensor.{CleanOldSamples, Command}
-import com.thecookiezen.co2.sensor.SensorCoordinator.SensorRequest
+import com.thecookiezen.co2.sensor.Co2Sensor.{CleanOldSamples, Co2SampleReading, Command}
+import com.thecookiezen.co2.sensor.SensorCoordinator.{SensorRequest, isDateFromLast30Days}
 
 import scala.concurrent.duration.{Duration, DurationInt}
 
@@ -43,13 +43,13 @@ class SensorCoordinator(alertThreshold: Measurement) extends Actor with ActorLog
 }
 
 object SensorCoordinator {
-  private val DefaulZoneId: ZoneId = ZoneId.of("UTC");
+  private val DefaultZoneId: ZoneId = ZoneId.of("UTC")
 
   def props(alertThreshold: Measurement): Props = Props(new SensorCoordinator(alertThreshold))
 
-  def isDateFromLast30Days(time: LocalDateTime): Boolean = {
-    val thirtyDaysAgo = LocalDate.now(DefaulZoneId).minusDays(31)
-    time.atZone(DefaulZoneId).toLocalDate.isAfter(thirtyDaysAgo)
+  def isDateFromLast30Days(time: ZonedDateTime): Boolean = {
+    val thirtyDaysAgo = LocalDate.now(DefaultZoneId).minusDays(31)
+    time.toLocalDate.isAfter(thirtyDaysAgo)
   }
 
   case class SensorRequest(id: UUID, command: Command)
