@@ -27,8 +27,10 @@ object Dependencies {
 
   lazy val akka = Seq(
     "com.typesafe.akka" %% "akka-actor" % akkaVersion % Compile,
+    "com.typesafe.akka" %% "akka-actor-typed" % akkaVersion % Compile,
     "com.typesafe.akka" %% "akka-http" % akkaHttpVersion % Compile,
     "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
+    "com.typesafe.akka" %% "akka-actor-testkit-typed" % akkaVersion % Test,
     "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test
   )
 }

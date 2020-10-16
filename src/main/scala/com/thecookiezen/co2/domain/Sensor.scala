@@ -1,9 +1,8 @@
 package com.thecookiezen.co2.domain
 
-import java.time.ZonedDateTime
 import java.util.UUID
 
-import com.thecookiezen.co2.domain.Co2Sample.Measurement
+import com.thecookiezen.co2.domain.SensorProtocol.Co2SampleReading
 
 import scala.concurrent.Future
 
@@ -18,11 +17,4 @@ object Sensor {
   case object OK extends SensorState
   case object WARN extends SensorState
   case object ALERT extends SensorState
-
-
-  sealed trait Command
-  case class Co2SampleReading(time: ZonedDateTime, measurement: Measurement) extends Command
-  case object GetStatus extends Command
-  case object GetAlertList extends Command
-  case object GetStatistics extends Command
 }
