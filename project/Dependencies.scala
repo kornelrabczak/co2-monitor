@@ -21,12 +21,13 @@ object Dependencies {
     "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-akka-http" % tapirVersion % Compile
   )
 
-
   lazy val akkaVersion = "2.6.9"
   lazy val akkaHttpVersion = "10.2.0"
 
   lazy val akka = Seq(
     "com.typesafe.akka" %% "akka-actor" % akkaVersion % Compile,
+    "com.typesafe.akka" %% "akka-cluster" % akkaVersion % Compile,
+    "com.typesafe.akka" %% "akka-cluster-sharding" % akkaVersion % Compile,
     "com.typesafe.akka" %% "akka-http" % akkaHttpVersion % Compile,
     "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
     "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test

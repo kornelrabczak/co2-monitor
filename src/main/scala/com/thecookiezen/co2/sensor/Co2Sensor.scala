@@ -1,7 +1,6 @@
 package com.thecookiezen.co2.sensor
 
 import java.time._
-import java.util.UUID
 
 import akka.actor.{Actor, ActorLogging, Props}
 import com.thecookiezen.co2.domain.Co2Sample.Measurement
@@ -12,12 +11,12 @@ import com.thecookiezen.co2.sensor.Co2Sensor._
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration
 
-class Co2Sensor(id: UUID, alertThreshold: Measurement) extends Actor with ActorLogging {
+class Co2Sensor(alertThreshold: Measurement) extends Actor with ActorLogging {
 
   private val alertLogs: ListBuffer[AlertLog] = ListBuffer.empty
   private var measurements: ListBuffer[Co2Sample] = ListBuffer.empty
 
-  log.info("Device actor {} started", id)
+  log.info("Device actor {} started", self.path.name)
 
   override def receive: Receive = oKwithData.orElse(handleQueries)
 
@@ -29,11 +28,15 @@ class Co2Sensor(id: UUID, alertThreshold: Measurement) extends Actor with ActorL
         val alert = AlertLog(startTime = sample.utcTimestamp, measurements = List(sample.sample))
         changeState(warning(okCounter = 0, alertCounter = 1, possibleAlertLog = alert))
       }
-    case GetStatus => sender() ! OK
+    case GetStatus =>
+      log.info("Status OK on {} device", self.path.name)
+      sender() ! OK
   }
 
   private def warning(okCounter: Int, alertCounter: Int, possibleAlertLog: AlertLog): Receive = {
-    case GetStatus => sender() ! WARN
+    case GetStatus =>
+      log.info("Status WARNING on {} device", self.path.name)
+      sender() ! WARN
     case reading: Co2SampleReading =>
       val sample = Co2Sample.fromReading(reading)
       measurements += sample
@@ -55,7 +58,9 @@ class Co2Sensor(id: UUID, alertThreshold: Measurement) extends Actor with ActorL
   }
 
   private def alert(okCounter: Int, alertLog: AlertLog): Receive = {
-    case GetStatus => sender() ! ALERT
+    case GetStatus =>
+      log.info("Status ALERT on {} device", self.path.name)
+      sender() ! ALERT
     case GetAlertList => sender() ! alertLogs.toList :+ alertLog
     case reading: Co2SampleReading =>
       val sample = Co2Sample.fromReading(reading)
@@ -96,7 +101,7 @@ class Co2Sensor(id: UUID, alertThreshold: Measurement) extends Actor with ActorL
 object Co2Sensor {
   private val DefaultZoneId: ZoneId = ZoneId.of("UTC");
 
-  def props(id: UUID, alertThreshold: Measurement): Props = Props(new Co2Sensor(id, alertThreshold))
+  def props(alertThreshold: Measurement): Props = Props(new Co2Sensor(alertThreshold))
 
   case class CleanOldSamples(duration: Duration)
 }
