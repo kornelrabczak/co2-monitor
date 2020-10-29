@@ -1,9 +1,9 @@
 package com.thecookiezen.co2.sensor
 
-import java.time.{LocalDate, ZoneId, ZonedDateTime}
 import java.util.UUID
 
-import akka.actor.ActorRef
+import akka.actor.{ActorRef, ActorSystem}
+import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.thecookiezen.co2.domain.{AlertLog, Statistics}
@@ -14,12 +14,23 @@ import scala.concurrent.duration.DurationInt
 object SensorCoordinator {
   implicit val timeout = Timeout(1.seconds)
 
-  private val DefaultZoneId: ZoneId = ZoneId.of("UTC")
-
-  def isDateFromLast30Days(time: ZonedDateTime): Boolean = {
-    val thirtyDaysAgo = LocalDate.now(DefaultZoneId).minusDays(31)
-    time.toLocalDate.isAfter(thirtyDaysAgo)
+  val extractEntityId: ShardRegion.ExtractEntityId = {
+    case SensorRequest(id, payload) => (id.toString, payload)
   }
+
+  val numberOfShards = 10
+  val extractShardId: ShardRegion.ExtractShardId = {
+    case SensorRequest(id, _)       => (id.hashCode() % numberOfShards).toString
+    case ShardRegion.StartEntity(id) => (id.toLong % numberOfShards).toString
+  }
+
+  def createCoordinator(system: ActorSystem, thresholdLevel: Int): ActorRef = ClusterSharding(system).start(
+    typeName = "Co2",
+    entityProps = Co2Sensor.props(thresholdLevel),
+    settings = ClusterShardingSettings(system),
+    extractEntityId = extractEntityId,
+    extractShardId = extractShardId
+  )
 
   case class SensorRequest(id: UUID, command: Command)
 
