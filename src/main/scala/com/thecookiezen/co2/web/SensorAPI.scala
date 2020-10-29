@@ -73,7 +73,7 @@ class SensorAPI(storeMeasurement: StoreMeasurement,
   }
 
   private def handleGetStatistics(getStatistics: GetStatistics)(uuid: UUID): Future[Either[Unit, StatisticsJson]] = {
-    getStatistics(uuid).map(stats => Right(StatisticsJson(stats.average.toInt, stats.maxLevel)))
+    getStatistics(uuid).map(stats => Right(StatisticsJson(stats.maxLevel, stats.average.toInt)))
   }
 
   private def handleGetAlerts(getAlerts: GetAlertLogs)(uuid: UUID): Future[Either[Unit, List[AlertLogJson]]] = {
