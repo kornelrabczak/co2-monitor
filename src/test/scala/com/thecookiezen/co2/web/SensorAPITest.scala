@@ -45,7 +45,7 @@ class SensorAPITest extends AnyFlatSpec with Matchers with ScalatestRouteTest {
 
   it should "return statistics for the sensor" in {
     Get("api/v1/sensors/25e05030-a380-466f-94d8-addf6688c462/metrics") ~> sensorAPI.routes ~> check {
-      responseAs[String] shouldEqual """{"maxLast30Days":20,"avgLast30Days":400}"""
+      responseAs[String] shouldEqual """{"maxLast30Days":400,"avgLast30Days":20}"""
     }
   }
 
